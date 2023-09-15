@@ -19,7 +19,7 @@ public class Twitter {
     private final Config config = Config.INSTANCE;
     private final TwitterInfo info = TwitterInfo.INSTANCE;
     private final Map<String,Long> user = info.getTwitterUser();
-    private final Map<Long,Long> lastId = info.getLastTweetId();
+
 
     private final OkHttpClient client = new OkHttpClient.Builder()
             .proxy(new Proxy(Proxy.Type.HTTP, new InetSocketAddress(config.getProxyHost(), config.getProxyPort())))
@@ -114,5 +114,6 @@ public class Twitter {
         }else if(execute.code() == 200){
 
         }
+        return null;
     }
 }
