@@ -2,6 +2,8 @@ package xyz.starsoc;
 
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
+import net.mamoe.mirai.event.GlobalEventChannel;
+import xyz.starsoc.event.GroupMsg;
 import xyz.starsoc.file.Config;
 import xyz.starsoc.twitter.TwitterThread;
 
@@ -20,7 +22,10 @@ public final class TwitterToGroup extends JavaPlugin{
         reload();
         //开启线程
         TwitterThread.run();
-        getLogger().info("Plugin loaded!");
+
+        GlobalEventChannel.INSTANCE.registerListenerHost(new GroupMsg());
+
+        getLogger().info("TwitterToGroup加载成功");
     }
 
 

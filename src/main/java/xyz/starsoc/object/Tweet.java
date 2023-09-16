@@ -8,15 +8,15 @@ import java.util.Set;
 public class Tweet {
     private String text;
     //考虑有多个文件
-    //video后面再试
+    //TODO video后面再试
     private FileOutputStream video;
 
-    private Set<ByteArrayOutputStream> image = new HashSet<>();
+    private Set<String> image = new HashSet<>();
 
     public Tweet() {
     }
 
-    public Tweet(String text, Set<ByteArrayOutputStream> image) {
+    public Tweet(String text, Set<String> image) {
         this.text = text;
         this.image = image;
     }
@@ -29,19 +29,11 @@ public class Tweet {
         this.text = text;
     }
 
-    public FileOutputStream getVideo() {
-        return video;
-    }
-
-    public void setVideo(FileOutputStream video) {
-        this.video = video;
-    }
-
-    public Set<ByteArrayOutputStream> getImage() {
+    public Set<String> getImage() {
         return image;
     }
 
-    public void setImage(Set<ByteArrayOutputStream> image) {
+    public void setImage(Set<String> image) {
         this.image = image;
     }
 }
