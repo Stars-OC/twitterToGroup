@@ -129,7 +129,7 @@ public class Twitter {
         }
 
         if(successful == 0){
-            logger.warn("获取用户数:" + count + " 失败");
+            logger.warn("获取用户:" + count + " 失败");
             return false;
         }
 
@@ -178,7 +178,7 @@ public class Twitter {
 //            logger.info(execute.body().string());
 //            logger.info(String.format(TwitterUrl.userUrl, url));
             if(execute.isSuccessful()){
-                logger.info("图片获取成功");
+//                logger.info("图片获取成功");
                 return execute.body().bytes();
             }
         } catch (IOException e) {
@@ -241,8 +241,8 @@ public class Twitter {
 
             //TODO 用合并消息进行发送
             Group group = messageChain.getGroup(groupId);
-            group.sendMessage("用户 [" + username + "] 更新了推文: {" + tweetId + "}");
-            MessageChainBuilder messages = messageChain.makeImageChain(group, list);
+
+            MessageChainBuilder messages = new MessageChainBuilder().append("用户 [" + username + "] 更新了推文{ID" + tweetId + "}:");
             String text = tweetObject.getText();
             //防止字数过长
             if(text.length() > 3000){
@@ -253,6 +253,10 @@ public class Twitter {
 
             }else {
                 messages.append(text);
+            }
+            for (byte[] image : list){
+                Image pic = group.uploadImage(ExternalResource.create(image).toAutoCloseable());
+                messages.append(pic);
             }
             group.sendMessage(messages.build());
 
@@ -278,7 +282,7 @@ public class Twitter {
         }
 
         if(successful == 0){
-            logger.warn("获取推文数:" + count + " 失败");
+            logger.info("获取推文:" + count + " 获取失败或未检查到推文");
             return false;
         }
 

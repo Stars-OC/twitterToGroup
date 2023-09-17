@@ -19,16 +19,6 @@ public class BuildMessageChain {
     private final Map<Long, Set<String>> groups = info.getTwitterToGroup();
     private final Config config = Config.INSTANCE;
 
-    public MessageChainBuilder makeImageChain(Group group, ArrayList<byte[]> images){
-        MessageChainBuilder messages = new MessageChainBuilder();
-
-        for (byte[] image : images){
-            Image pic = group.uploadImage(ExternalResource.create(image).toAutoCloseable());
-            messages.append(pic);
-        }
-
-        return messages;
-    }
 
     public ArrayList<MessageChain> makeTextChain(String text){
         //TODO 用图片装

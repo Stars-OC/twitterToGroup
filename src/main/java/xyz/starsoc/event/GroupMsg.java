@@ -6,7 +6,6 @@ import net.mamoe.mirai.event.SimpleListenerHost;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.message.data.MessageContent;
 import net.mamoe.mirai.message.data.PlainText;
-import net.mamoe.mirai.utils.ExternalResource;
 import org.jetbrains.annotations.NotNull;
 import xyz.starsoc.TwitterToGroup;
 import xyz.starsoc.file.Config;
@@ -44,7 +43,7 @@ public class GroupMsg extends SimpleListenerHost {
 
         String message = content.contentToString();
 
-        if (!message.startsWith("!twitter")){
+        if (!(message.startsWith("!twitter") || message.startsWith("！twitter"))){
             return;
         }
 
@@ -82,22 +81,43 @@ public class GroupMsg extends SimpleListenerHost {
                 String addUsers = "";
                 for(int i = 2;i < commands.length;i++){
                     String user = commands[i];
-                    addUsers += user;
-                    addTwitterUser(groupId,user);
+                    addUsers += addTwitterUser(groupId,user)?user : "";
 
                     if(i == commands.length-1){
                         break;
                     }
                     addUsers += " ";
                 }
-                groupObject.sendMessage("添加[" + addUsers + "]成功");
+                groupObject.sendMessage("添加推特用户[" + addUsers + "]成功");
                 return;
             case "delete":
+                String deleteUsers = "";
+                for (int i = 2;i < commands.length;i++){
+                    String user = commands[i];
+
+                    deleteUsers += deleteTwitterUser(groupId,user)?user : "";
+
+                    if(i == commands.length-1){
+                        break;
+                    }
+                    deleteUsers += " ";
+                }
+                groupObject.sendMessage("删除推特用户[" + deleteUsers + "]成功");
                 return;
             case "search":
                 return;
             case "addPer":
+                String addUserPer = "";
+                for(int i = 2;i < commands.length;i++){
+                    long user = Long.parseLong(commands[i].replace("@",""));
+                    addUserPer += addUserPer(groupId,userId)?user : "";
 
+                    if(i == commands.length-1){
+                        break;
+                    }
+                    addUserPer += " ";
+                }
+                groupObject.sendMessage("添加群聊 (" + groupId + ") 权限给 [" + addUserPer + "] 成功");
                 return;
             case "deletePer":
                 return;
@@ -107,6 +127,7 @@ public class GroupMsg extends SimpleListenerHost {
 
     }
 
+    //TODO 将下面的重复进行优化
     private boolean addTwitterUser(long groupId,String user){
         if(!groups.containsKey(groupId)){
             groups.put(groupId,new HashSet<>());
@@ -114,4 +135,28 @@ public class GroupMsg extends SimpleListenerHost {
         return groups.get(groupId).add(user);
     }
 
+    private boolean deleteTwitterUser(long groupId,String user){
+        if(!groups.containsKey(groupId)){
+            groups.put(groupId,new HashSet<>());
+            return false;
+        }
+
+        return groups.get(groupId).remove(user);
+    }
+
+    private boolean addUserPer(long groupId,long userId){
+        if(!per.containsKey(groupId)){
+            per.put(groupId,new HashSet<>());
+        }
+        return per.get(groupId).add(userId);
+    }
+
+    private boolean deleteUserPer(long groupId,long userId){
+        if(!per.containsKey(groupId)){
+            per.put(groupId,new HashSet<>());
+            return false;
+        }
+
+        return per.get(groupId).remove(userId);
+    }
 }
