@@ -6,13 +6,9 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import xyz.starsoc.TwitterToGroup;
-import xyz.starsoc.file.Config;
 import xyz.starsoc.file.TwitterInfo;
 import xyz.starsoc.object.Tweet;
 
-import java.io.File;
-import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,7 +20,7 @@ public class HtmlParse {
 
     private final TwitterInfo info = TwitterInfo.INSTANCE;
     private final Map<String,Long> lastId = info.getLastTweetId();
-    private static Logger logger = LoggerFactory.getLogger("Html解析");
+    private static Logger logger = LoggerFactory.getLogger("HtmlParse");
 
     //将新网址进行访问
     public String getNewUrl(String html){
@@ -55,9 +51,17 @@ public class HtmlParse {
     public Tweet getTweet(String html){
         Tweet tweet = new Tweet();
         Document parse = Jsoup.parse(html);
-        Element mainBody = parse.getElementById("m");
 
+        Element mainBody = parse.getElementById("m");
         Element bodyText = mainBody.getElementsByClass("tweet-content media-body").get(0);
+
+        Set<String> imageList = tweet.getImage();
+        Elements images = mainBody.getElementsByClass("still-image");
+        for (int i = 0;i< images.size();i++){
+            String pic = images.get(i).attr("href");
+            imageList.add(pic);
+        }
+//        logger.info("imagePath " + imageList.size());
         tweet.setText(bodyText.text());
         return tweet;
     }
@@ -69,6 +73,8 @@ public class HtmlParse {
 
         HashSet<Long> userTweets = tweets.get(user);
         userTweets.add(tweet);
+        //为其添加最后获取的推文id 以防重复获取
+        lastId.put(user,tweet);
     }
 
     public boolean setTweets(String html){
@@ -101,6 +107,7 @@ public class HtmlParse {
             }
 
         }
+
         return true;
     }
 

@@ -8,6 +8,7 @@ import net.mamoe.mirai.message.data.MessageContent;
 import net.mamoe.mirai.message.data.PlainText;
 import net.mamoe.mirai.utils.ExternalResource;
 import org.jetbrains.annotations.NotNull;
+import xyz.starsoc.TwitterToGroup;
 import xyz.starsoc.file.Config;
 import xyz.starsoc.file.TwitterInfo;
 
@@ -21,6 +22,7 @@ public class GroupMsg extends SimpleListenerHost {
     private final Set<Long> group = config.getEnableGroup();
     private final TwitterInfo info = TwitterInfo.INSTANCE;
     private final Map<Long, Set<String>> groups = info.getTwitterToGroup();
+    private final Map<Long, Set<Long>> per = info.getGroupPermission();
 
     @EventHandler
     public void onMessage(@NotNull GroupMessageEvent event) throws Exception {// 可以抛出任何异常, 将在 handleException 处理
@@ -46,10 +48,28 @@ public class GroupMsg extends SimpleListenerHost {
             return;
         }
 
-        String[] commands = message.split(" ");
+        if (!per.containsKey(groupId)){
+            per.put(groupId,new HashSet<>());
+        }
 
-        if(commands[1].equals("help")){
-            //help
+        if (!per.get(groupId).contains(userId)){
+            if(config.getMaster() != userId){
+                return;
+            }
+        }
+
+        String[] commands = message.split(" ");
+        if (commands.length == 2){
+
+            switch (commands[1]){
+                case "help":
+                    return;
+                case "reload":
+                    TwitterToGroup.INSTANCE.reload();
+                    groupObject.sendMessage("插件重载成功");
+                    return;
+            }
+
         }
 
         if (commands.length < 3){
@@ -77,6 +97,7 @@ public class GroupMsg extends SimpleListenerHost {
             case "search":
                 return;
             case "addPer":
+
                 return;
             case "deletePer":
                 return;

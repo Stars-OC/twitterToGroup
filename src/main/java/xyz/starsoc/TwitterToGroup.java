@@ -5,6 +5,7 @@ import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
 import net.mamoe.mirai.event.GlobalEventChannel;
 import xyz.starsoc.event.GroupMsg;
 import xyz.starsoc.file.Config;
+import xyz.starsoc.file.TwitterInfo;
 import xyz.starsoc.twitter.TwitterThread;
 
 public final class TwitterToGroup extends JavaPlugin{
@@ -31,5 +32,6 @@ public final class TwitterToGroup extends JavaPlugin{
 
     public void reload(){
         reloadPluginConfig(Config.INSTANCE);
+        reloadPluginData(TwitterInfo.INSTANCE);
     }
 }

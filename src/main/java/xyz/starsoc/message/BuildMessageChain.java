@@ -3,14 +3,13 @@ package xyz.starsoc.message;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.message.data.Image;
+import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.MessageChainBuilder;
 import net.mamoe.mirai.utils.ExternalResource;
 import xyz.starsoc.file.Config;
 import xyz.starsoc.file.TwitterInfo;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class BuildMessageChain {
 
@@ -20,14 +19,31 @@ public class BuildMessageChain {
     private final Map<Long, Set<String>> groups = info.getTwitterToGroup();
     private final Config config = Config.INSTANCE;
 
-    public MessageChainBuilder makeChain(Group group, ArrayList<byte[]> images){
+    public MessageChainBuilder makeImageChain(Group group, ArrayList<byte[]> images){
         MessageChainBuilder messages = new MessageChainBuilder();
+
         for (byte[] image : images){
             Image pic = group.uploadImage(ExternalResource.create(image).toAutoCloseable());
             messages.append(pic);
         }
 
         return messages;
+    }
+
+    public ArrayList<MessageChain> makeTextChain(String text){
+        //TODO 用图片装
+        //防止字数过长
+        ArrayList<MessageChain> set = new ArrayList<>();
+        for (int i = 0;i < text.length();i+=3000){
+            MessageChainBuilder builder = new MessageChainBuilder();
+            if(text.length() < i + 3000){
+                builder.append(text.substring(i));
+            }else {
+                builder.append(text.substring(i, i + 3000));
+            }
+            set.add(builder.build());
+        }
+        return set;
     }
 
     public Group getGroup(long groupId){

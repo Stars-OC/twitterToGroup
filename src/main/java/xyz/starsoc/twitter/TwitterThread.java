@@ -12,18 +12,26 @@ import java.util.concurrent.TimeUnit;
 
 
 public class TwitterThread {
-    private static Logger logger = LoggerFactory.getLogger("Twitter进程");
+    private static Logger logger = LoggerFactory.getLogger("TwitterThread");
 
     private final static Twitter twitter = Twitter.INSTANCE;
+    private final static Config config = Config.INSTANCE;
+    private final static TwitterUrl url = new TwitterUrl();
+    private static boolean flag = false;
 
     public static void run() {
-        Config config = Config.INSTANCE;
+        logger.info("执行线程TwitterThread");
+
         //执行线程
         Runnable runnable = () -> {
             //若没有处理好init就关闭
-            if (new TwitterUrl().initUrl()){
-                logger.warn("Url获取失败。");
-                return;
+            if(!flag){
+                if (!url.initUrl()){
+                    logger.warn("Url获取失败。");
+                    return;
+                }else {
+                    flag = true;
+                }
             }
 
             //开始进行执行 TODO 将源站的做出来
@@ -36,10 +44,10 @@ public class TwitterThread {
                 return;
             }
 
-            logger.info("获取推文成功，正在发送到各群");
+            logger.info("获取推文成功，发送到各群完毕");
 
         };
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
-        service.scheduleAtFixedRate(runnable, 10, config.getTime(), TimeUnit.SECONDS);
+        service.scheduleAtFixedRate(runnable, 20, config.getTime(), TimeUnit.SECONDS);
     }
 }

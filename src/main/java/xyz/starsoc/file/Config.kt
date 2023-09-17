@@ -14,7 +14,7 @@ object Config : AutoSavePluginConfig("config") {
     val proxyHost by value("127.0.0.1")
     val proxyPort by value(10809)
 
-    val time by value(3000)
+    val time by value(300)
 
     val username by value("")
     val password by value("")
