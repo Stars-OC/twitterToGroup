@@ -5,10 +5,7 @@ import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChain;
 import net.mamoe.mirai.message.data.MessageChainBuilder;
 import net.mamoe.mirai.utils.ExternalResource;
-import okhttp3.Call;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import xyz.starsoc.file.Config;
@@ -24,6 +21,7 @@ import java.util.*;
 public class Twitter {
 
     public static final Twitter INSTANCE = new Twitter();
+    public static final  Set<String> all = new HashSet<>();
 
     private static Logger logger = LoggerFactory.getLogger("Twitter");
 
@@ -34,7 +32,6 @@ public class Twitter {
     private final Map<String,Long> user = info.getTwitterUser();
     private final Map<Long, Set<String>> group = info.getTwitterToGroup();
     private final HashMap<String, HashSet<Long>> tweets = HtmlParse.tweets;
-    private final ArrayList<Tweet> tweet = new ArrayList<>();
 
 
     private final OkHttpClient client = new OkHttpClient.Builder()
@@ -113,7 +110,7 @@ public class Twitter {
         int count = 0;
         int successful = 0;
 
-        Set<String> all = new HashSet<>();
+
         for (Set<String> user : group.values()){
             all.addAll(user);
         }
@@ -127,9 +124,10 @@ public class Twitter {
                 logger.warn("推特用户 :" + username + " 不存在或者网络链接不上");
             }
         }
-
         if(successful == 0){
-            logger.warn("获取用户:" + count + " 失败");
+            if (count != 0){
+                logger.warn("获取用户:" + count + " 失败");
+            }
             return false;
         }
 
@@ -146,7 +144,8 @@ public class Twitter {
             return false;
         }
 
-        String html = execute.body().string();
+        ResponseBody body = execute.body();
+        String html = body.string();
         if (execute.code() == 201){
             String newUrl = parse.getNewUrl(html);
             if(newUrl == null){
@@ -158,10 +157,12 @@ public class Twitter {
                 return false;
             }
 
+            body.close();
             return parse.setTweets(tweets);
 
         }else if(execute.code() == 200){
 
+            body.close();
             return parse.setTweets(html);
 
         }
@@ -179,7 +180,10 @@ public class Twitter {
 //            logger.info(String.format(TwitterUrl.userUrl, url));
             if(execute.isSuccessful()){
 //                logger.info("图片获取成功");
-                return execute.body().bytes();
+                ResponseBody body = execute.body();
+                byte[] bytes = body.bytes();
+                body.close();
+                return bytes;
             }
         } catch (IOException e) {
             return null;
@@ -189,17 +193,21 @@ public class Twitter {
     }
 
     public boolean getTweet(String username,long tweetId){
-        Call call = getCall(String.format(TwitterUrl.tweetUrl, username, tweetId));
-
+        String format = String.format(TwitterUrl.tweetUrl, username, tweetId);
+        Call call = getCall(format);
+        //TODO 将回复消息另写一个存储池
         try {
 
             Response execute = call.execute();
             if(!execute.isSuccessful()){
+                logger.warn("非正常退出链接: " + format);
+                execute.close();
                 return false;
             }
             Tweet tweetObject = null;
             //TODO 出问题就改这边 将URL进行替换
-            String html = execute.body().string();
+            ResponseBody body = execute.body();
+            String html = body.string();
             //logger.info(html);
             if (execute.code() == 201){
 
@@ -207,6 +215,7 @@ public class Twitter {
                 if(newUrl == null){
                     return false;
                 }
+
                 String tweet = getRefresh(newUrl);
                 if(tweet == null){
                     return false;
@@ -222,6 +231,7 @@ public class Twitter {
 
             }
 
+            body.close();
             ArrayList<byte[]> list = new ArrayList<>();
 
             for(String imageUrl : tweetObject.getImage()){
@@ -242,7 +252,7 @@ public class Twitter {
             //TODO 用合并消息进行发送
             Group group = messageChain.getGroup(groupId);
 
-            MessageChainBuilder messages = new MessageChainBuilder().append("用户 [" + username + "] 更新了推文{ID" + tweetId + "}:");
+            MessageChainBuilder messages = new MessageChainBuilder().append("用户 [" + username + "] 更新了推文{ID" + tweetId + "}:\n");
             String text = tweetObject.getText();
             //防止字数过长
             if(text.length() > 3000){
@@ -261,6 +271,7 @@ public class Twitter {
             group.sendMessage(messages.build());
 
         } catch (IOException e) {
+
             return false;
         }
 
@@ -282,7 +293,9 @@ public class Twitter {
         }
 
         if(successful == 0){
-            logger.info("获取推文:" + count + " 获取失败或未检查到推文");
+            if (count != 0){
+                logger.info("获取推文: " + count + " 获取失败或未检查到推文");
+            }
             return false;
         }
 

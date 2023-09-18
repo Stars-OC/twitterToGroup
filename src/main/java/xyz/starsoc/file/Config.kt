@@ -20,6 +20,8 @@ object Config : AutoSavePluginConfig("config") {
     val password by value("")
     val cookies by value("")
 
+    val enableForward by value(false)
+
     val enableMirror by value(true)
     val mirrorList by value(mutableSetOf("https://nitter.unixfox.eu/"))
 }

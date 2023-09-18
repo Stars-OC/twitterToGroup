@@ -3,10 +3,14 @@ package xyz.starsoc;
 import net.mamoe.mirai.console.plugin.jvm.JavaPlugin;
 import net.mamoe.mirai.console.plugin.jvm.JvmPluginDescriptionBuilder;
 import net.mamoe.mirai.event.GlobalEventChannel;
+import okhttp3.OkHttpClient;
 import xyz.starsoc.event.GroupMsg;
 import xyz.starsoc.file.Config;
 import xyz.starsoc.file.TwitterInfo;
 import xyz.starsoc.twitter.TwitterThread;
+
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public final class TwitterToGroup extends JavaPlugin{
     public static final TwitterToGroup INSTANCE = new TwitterToGroup();
@@ -25,7 +29,8 @@ public final class TwitterToGroup extends JavaPlugin{
         TwitterThread.run();
 
         GlobalEventChannel.INSTANCE.registerListenerHost(new GroupMsg());
-
+        //监测okhttp
+        Logger.getLogger(OkHttpClient.class.getName()).setLevel(Level.FINE);
         getLogger().info("TwitterToGroup加载成功");
     }
 

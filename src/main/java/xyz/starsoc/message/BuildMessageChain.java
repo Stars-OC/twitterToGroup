@@ -2,9 +2,7 @@ package xyz.starsoc.message;
 
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Group;
-import net.mamoe.mirai.message.data.Image;
-import net.mamoe.mirai.message.data.MessageChain;
-import net.mamoe.mirai.message.data.MessageChainBuilder;
+import net.mamoe.mirai.message.data.*;
 import net.mamoe.mirai.utils.ExternalResource;
 import xyz.starsoc.file.Config;
 import xyz.starsoc.file.TwitterInfo;
@@ -19,6 +17,10 @@ public class BuildMessageChain {
     private final Map<Long, Set<String>> groups = info.getTwitterToGroup();
     private final Config config = Config.INSTANCE;
 
+    public static void main(Group group,ArrayList<MessageChain> chains) {
+        ForwardMessageBuilder builder = new ForwardMessageBuilder(group);
+
+    }
 
     public ArrayList<MessageChain> makeTextChain(String text){
         //TODO 用图片装

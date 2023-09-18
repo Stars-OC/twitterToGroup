@@ -6,6 +6,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import xyz.starsoc.file.Config;
 import xyz.starsoc.file.TwitterInfo;
 import xyz.starsoc.object.Tweet;
 
@@ -18,7 +19,10 @@ public class HtmlParse {
 
     public static final HashMap<String, HashSet<Long>> tweets = new HashMap<>();
 
+    public static final HashMap<String, HashSet<Long>> forwardGroup = new HashMap<>();
+
     private final TwitterInfo info = TwitterInfo.INSTANCE;
+    private final Config config = Config.INSTANCE;
     private final Map<String,Long> lastId = info.getLastTweetId();
     private static Logger logger = LoggerFactory.getLogger("HtmlParse");
 
@@ -73,8 +77,11 @@ public class HtmlParse {
 
         HashSet<Long> userTweets = tweets.get(user);
         userTweets.add(tweet);
+
         //为其添加最后获取的推文id 以防重复获取
-        lastId.put(user,tweet);
+        if(lastId.get(user) < tweet){
+            lastId.put(user,tweet);
+        }
     }
 
     public boolean setTweets(String html){
@@ -86,12 +93,23 @@ public class HtmlParse {
             //logger.warn("尚未解析到该页面的推文");
             return false;
         }
-
+        //初始User
+        String user = parse.getElementsByClass("profile-card-username").get(0).text().substring(1);
         Elements pinned = parse.getElementsByClass("pinned");
-        //先用总的判断有哪些进行了更新
-        String[] content = tweets.get(0).attr("href").split("/");
 
-        String user = content[1];
+        //先用总的判断有哪些进行了更新 转发推特修改
+        int realSize = pinned.size();
+        //这个是除去转发的推文 先去除明天再说
+        while (!config.getEnableForward()){
+            if(!tweets.get(realSize).attr("href").contains(user)){
+                realSize++;
+            }else {
+                break;
+            }
+        }
+
+        //TODO 适配转发的推文 -> 只需要一个User即可
+        String[] content = tweets.get(realSize).attr("href").split("/");
         if(!lastId.containsKey(user)){
             lastId.put(user,getTweetId(content));
             return false;
@@ -100,10 +118,27 @@ public class HtmlParse {
         long oldId = lastId.get(user);
         //判断新的推文，然后取代非新的
         for (int i = pinned.size();i < tweets.size();i++){
-            String[] link = tweets.get(i).attr("href").split("/");
+
+            //判断是否重复的user
+            String text = tweets.get(i).attr("href");
+            String[] link = text.split("/");
+            //用时间戳重构比较
+            if(!Twitter.all.contains(user) && !text.contains(user)){
+                //转发User
+                user = link[1];
+                oldId = lastId.get(user);
+            }
+            if(!config.getEnableForward()){
+                continue;
+            }
+
+
+            //转发的对应
             long newId = getTweetId(link);
             if(oldId < newId){
                 addTweet(user,newId);
+            }else {
+                break;
             }
 
         }

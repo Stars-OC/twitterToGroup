@@ -46,15 +46,17 @@ public class TwitterUrl {
             switch (execute.code()){
                 case 200:
                 case 201:
-                    webUrl = "https://nitter.unixfox.eu%s";
-                    userUrl = "https://nitter.unixfox.eu/%s";
-                    tweetsUrl = "https://nitter.unixfox.eu/%s";
-                    tweetUrl = "https://nitter.unixfox.eu/%s/status/%s";
+                    execute.body().close();
+                    webUrl = url.substring(0,url.length()-1) + "%s";
+                    userUrl = url + "%s";
+                    tweetsUrl = url + "%s";
+                    tweetUrl = url + "%s/status/%s";
                     isMirror = true;
                     return true;
                 default:
                     break;
             }
+            execute.close();
         }
         return false;
     }
@@ -80,9 +82,11 @@ public class TwitterUrl {
         try {
             execute = client.newCall(request).execute();
         } catch (IOException e) {
+            execute.close();
             return false;
         }
         if (!execute.isSuccessful()){
+            execute.close();
             return false;
         }
         switch (execute.code()){
@@ -92,6 +96,7 @@ public class TwitterUrl {
             default:
                 break;
         }
+        execute.close();
         return false;
     }
 
