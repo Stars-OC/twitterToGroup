@@ -8,6 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import xyz.starsoc.TwitterToGroup;
 import xyz.starsoc.file.Config;
 import xyz.starsoc.file.TwitterInfo;
+import xyz.starsoc.twitter.data.Twitter;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -148,6 +149,7 @@ public class GroupMsg extends SimpleListenerHost {
         if(!groups.containsKey(groupId)){
             groups.put(groupId,new HashSet<>());
         }
+        Twitter.isAdd = true;
         return groups.get(groupId).add(user);
     }
 
@@ -156,7 +158,7 @@ public class GroupMsg extends SimpleListenerHost {
             groups.put(groupId,new HashSet<>());
             return false;
         }
-
+        Twitter.isAdd = true;
         return groups.get(groupId).remove(user);
     }
 

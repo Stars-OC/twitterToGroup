@@ -43,14 +43,5 @@ public class BuildMessageChain {
         Bot bot = Bot.getInstance(config.getBot());
         return bot.getGroupOrFail(groupId);
     }
-    public long getTwitterGroup(String username){
-        //TODO 后期将其进行更改 -> Q：多个群聊相同的username怎么办
-        for (long groupId : groups.keySet()){
-            if(groups.get(groupId).contains(username)){
-                return groupId;
-            }
-        }
-        return 0;
-    }
 
 }

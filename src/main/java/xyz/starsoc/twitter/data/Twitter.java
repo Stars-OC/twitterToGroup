@@ -12,26 +12,31 @@ import xyz.starsoc.file.Config;
 import xyz.starsoc.file.TwitterInfo;
 import xyz.starsoc.message.BuildMessageChain;
 import xyz.starsoc.object.Tweet;
+import xyz.starsoc.object.UserToGroup;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Twitter {
 
     public static final Twitter INSTANCE = new Twitter();
-    public static final  Set<String> all = new HashSet<>();
+    public static final HashSet<UserToGroup> ALL = new HashSet<>();
+    public static Set<String> users = new HashSet<>();
+    public static boolean isAdd = true;
 
-    private static Logger logger = LoggerFactory.getLogger("Twitter");
+    private static final Logger logger = LoggerFactory.getLogger("Twitter");
 
     private final HtmlParse parse = HtmlParse.INSTANCE;
     private final BuildMessageChain messageChain = BuildMessageChain.INSTANCE;
     private final Config config = Config.INSTANCE;
     private final TwitterInfo info = TwitterInfo.INSTANCE;
     private final Map<String,Long> user = info.getTwitterUser();
-    private final Map<Long, Set<String>> group = info.getTwitterToGroup();
+    private final Map<Long, Set<String>> groups = info.getTwitterToGroup();
     private final HashMap<String, HashSet<Long>> tweets = HtmlParse.tweets;
+
 
 
     private final OkHttpClient client = new OkHttpClient.Builder()
@@ -107,16 +112,30 @@ public class Twitter {
     }
 
     public boolean getGroupUser(){
+        //TODO 多bot -> 还是直接对象存储
         int count = 0;
         int successful = 0;
 
+        if(isAdd){
+            isAdd = false;
+            for(long group : groups.keySet()){
 
-        for (Set<String> user : group.values()){
-            all.addAll(user);
+                for(String username : groups.get(group)){
+                    UserToGroup userToGroup = new UserToGroup(username, group);
+                    //logger.info(String.valueOf(userToGroup.hashCode()));
+                    ALL.add(userToGroup);
+                }
+
+            }
+
+            //防止重复获取 lambda优化
+            users = ALL.stream().map(UserToGroup::getUsername).collect(Collectors.toSet());
+//        for (UserToGroup userToGroup : ALL){
+//            users.add(userToGroup.getUsername());
+//        }
         }
 
-        //防止重复获取
-        for (String username : all){
+        for (String username : users){
             try {
                 count++;
                 successful += getUserTweets(username) ? 1 : 0;
@@ -192,8 +211,10 @@ public class Twitter {
         return null;
     }
 
-    public boolean getTweet(String username,long tweetId){
+    public boolean getTweet(UserToGroup userToGroup, long tweetId){
+        String username = userToGroup.getUsername();
         String format = String.format(TwitterUrl.tweetUrl, username, tweetId);
+//        logger.info(format);
         Call call = getCall(format);
         //TODO 将回复消息另写一个存储池
         try {
@@ -244,14 +265,11 @@ public class Twitter {
                 list.add(image);
             }
             //logger.info("Image Size: " + list.size());
-            long groupId = messageChain.getTwitterGroup(username);
-            if (groupId == 0){
-                return false;
-            }
+            long groupId = userToGroup.getGroup();
 
             //TODO 用合并消息进行发送
             Group group = messageChain.getGroup(groupId);
-
+//            logger.info(group.getName());
             MessageChainBuilder messages = new MessageChainBuilder().append("用户 [" + username + "] 更新了推文{ID" + tweetId + "}:\n");
             String text = tweetObject.getText();
             //防止字数过长
@@ -282,20 +300,26 @@ public class Twitter {
         int count = 0;
         int successful = 0;
 
-        //logger.info("getTweets");
-        for (String username : tweets.keySet()){
+        for (UserToGroup userToGroup : ALL){
+
+            String username = userToGroup.getUsername();
+            if(!tweets.containsKey(username)){
+                continue;
+            }
 
             for (long tweetId : tweets.get(username)){
                 count++;
-                successful += getTweet(username,tweetId) ? 1 : 0;
+                successful += getTweet(userToGroup,tweetId) ? 1 : 0;
+                logger.info("test");
             }
 
         }
 
         if(successful == 0){
             if (count != 0){
-                logger.info("获取推文: " + count + " 获取失败或未检查到推文");
+                logger.info("获取推文: " + count + " 获取失败");
             }
+            tweets.clear();
             return false;
         }
 

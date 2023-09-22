@@ -39,7 +39,6 @@ public class TwitterThread {
                 return;
             }
 
-            logger.info("获取User成功，开始进行推文的获取");
             if(!twitter.getTweets()){
                 return;
             }

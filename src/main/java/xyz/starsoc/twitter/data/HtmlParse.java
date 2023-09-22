@@ -108,7 +108,7 @@ public class HtmlParse {
             }
         }
 
-        //TODO 适配转发的推文 -> 只需要一个User即可
+        //TODO 适配转发的推文 -> 只需要一个User对象即可
         String[] content = tweets.get(realSize).attr("href").split("/");
         if(!lastId.containsKey(user)){
             lastId.put(user,getTweetId(content));
@@ -123,15 +123,16 @@ public class HtmlParse {
             String text = tweets.get(i).attr("href");
             String[] link = text.split("/");
             //用时间戳重构比较
-            if(!Twitter.all.contains(user) && !text.contains(user)){
-                //转发User
-                user = link[1];
-                oldId = lastId.get(user);
-            }
-            if(!config.getEnableForward()){
-                continue;
-            }
 
+            if(!text.contains(user)){
+                if(!config.getEnableForward()){
+                    continue;
+                }
+//                if(!Twitter.ALL.contains(user)){
+//                    user = link[1];
+//                    oldId = lastId.get(user);
+//                }
+            }
 
             //转发的对应
             long newId = getTweetId(link);
