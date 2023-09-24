@@ -309,8 +309,9 @@ public class Twitter {
 
             for (long tweetId : tweets.get(username)){
                 count++;
+                //TODO 将推文进行保存然后多群聊推送
                 successful += getTweet(userToGroup,tweetId) ? 1 : 0;
-                logger.info("test");
+//                logger.info("test");
             }
 
         }
