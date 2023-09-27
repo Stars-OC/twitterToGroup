@@ -53,8 +53,8 @@ public class GroupMsg extends SimpleListenerHost {
         }
 
         String[] commands = message.split(" ");
-        int length = commands.length;
-        if (length == 2){
+        int commandLength = commands.length;
+        if (commandLength == 2){
 
             switch (commands[1].toLowerCase()){
                 case "help":
@@ -91,19 +91,20 @@ public class GroupMsg extends SimpleListenerHost {
 
         }
 
-        if (length < 3){
+        if (commandLength < 3){
             groupObject.sendMessage("参数不足，请检查参数");
             return;
         }
-
+        Set<Long> groupKey = groups.keySet();
+        int groupSize = groupKey.size();
         switch (commands[1].toLowerCase()){
             case "add":
                 String addUsers = "";
-                for(int i = 2; i < length; i++){
+                for(int i = 2; i < commandLength; i++){
                     String user = commands[i];
                     addUsers += addTwitterUser(groupId,user)?user : "";
 
-                    if(i == length -1){
+                    if(i == commandLength -1){
                         break;
                     }
                     addUsers += " ";
@@ -112,12 +113,12 @@ public class GroupMsg extends SimpleListenerHost {
                 return;
             case "delete":
                 String deleteUsers = "";
-                for (int i = 2; i < length; i++){
+                for (int i = 2; i < commandLength; i++){
                     String user = commands[i];
 
                     deleteUsers += deleteTwitterUser(groupId,user)?user : "";
 
-                    if(i == length -1){
+                    if(i == commandLength -1){
                         break;
                     }
                     deleteUsers += " ";
@@ -128,11 +129,11 @@ public class GroupMsg extends SimpleListenerHost {
                 return;
             case "addper":
                 String addUserPer = "";
-                for(int i = 2; i < length; i++){
+                for(int i = 2; i < commandLength; i++){
                     long user = Long.parseLong(commands[i].replace("@",""));
                     addUserPer += addUserPer(groupId,user)?user+"" : "";
 
-                    if(i == length -1){
+                    if(i == commandLength -1){
                         break;
                     }
                     addUserPer += " ";
@@ -144,15 +145,15 @@ public class GroupMsg extends SimpleListenerHost {
             case "addall":
                 // 添加订阅至所有
                 String addAllUsers = "";
-                for(int i = 2;i < length;i++){
+                for(int i = 2; i < commandLength; i++){
                     String user = commands[i];
                     int count = 0;
-                    for(long group : groups.keySet()){
+                    for(long group : groupKey){
                         count += addTwitterUser(group,user)?1 : 0;
                     }
 
-                    addAllUsers += count==length?user:"";
-                    if(i == length -1){
+                    addAllUsers += count == groupSize?user:"";
+                    if(i == commandLength -1){
                         break;
                     }
                     addAllUsers += " ";
