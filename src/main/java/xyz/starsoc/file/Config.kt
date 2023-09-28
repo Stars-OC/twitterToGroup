@@ -8,6 +8,8 @@ object Config : AutoSavePluginConfig("config") {
     val bot : Long by value()
     @ValueDescription("最高权限")
     val master : Long by value()
+    @ValueDescription("debug模式，非开发者勿动")
+    val debug by value(false)
 
     val enableGroup : Set<Long> by value()
 

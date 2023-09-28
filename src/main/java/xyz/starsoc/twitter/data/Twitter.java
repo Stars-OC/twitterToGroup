@@ -134,10 +134,11 @@ public class Twitter {
 //            users.add(userToGroup.getUsername());
 //        }
         }
-
+        //users.forEach(System.out::println);
         for (String username : users){
             try {
                 count++;
+                //logger.info(username);
                 successful += getUserTweets(username) ? 1 : 0;
             } catch (IOException e) {
                 logger.warn("推特用户 :" + username + " 不存在或者网络链接不上");
@@ -167,9 +168,6 @@ public class Twitter {
         String html = body.string();
         if (execute.code() == 201){
             String newUrl = parse.getNewUrl(html);
-            if(newUrl == null){
-                return false;
-            }
 
             String tweets = getRefresh(newUrl);
             if(tweets == null){

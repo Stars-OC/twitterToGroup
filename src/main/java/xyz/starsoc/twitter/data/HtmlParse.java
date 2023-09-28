@@ -89,13 +89,15 @@ public class HtmlParse {
         Document parse = Jsoup.parse(html);
 
         Elements tweets = parse.getElementsByClass("tweet-link");
-        if(tweets.size() == 0){
+        int tweetSize = tweets.size();
+        if(tweetSize == 0){
             //logger.warn("尚未解析到该页面的推文");
             return false;
         }
         //初始User
         String user = parse.getElementsByClass("profile-card-username").get(0).text().substring(1);
         Elements pinned = parse.getElementsByClass("pinned");
+        logger.info(user);
 
         //先用总的判断有哪些进行了更新 转发推特修改
         int realSize = pinned.size();
@@ -109,6 +111,11 @@ public class HtmlParse {
         }
 
         //TODO 适配转发的推文 -> 只需要一个User对象即可
+        if(realSize >= tweetSize){
+            //防止这货转发太多照成的问题
+            return false;
+        }
+
         String[] content = tweets.get(realSize).attr("href").split("/");
         if(!lastId.containsKey(user)){
             lastId.put(user,getTweetId(content));
@@ -117,7 +124,7 @@ public class HtmlParse {
 
         long oldId = lastId.get(user);
         //判断新的推文，然后取代非新的
-        for (int i = pinned.size();i < tweets.size();i++){
+        for (int i = pinned.size(); i < tweetSize; i++){
 
             //判断是否重复的user
             String text = tweets.get(i).attr("href");
