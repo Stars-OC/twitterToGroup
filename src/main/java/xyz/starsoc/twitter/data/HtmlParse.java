@@ -97,7 +97,7 @@ public class HtmlParse {
         //初始User
         String user = parse.getElementsByClass("profile-card-username").get(0).text().substring(1);
         Elements pinned = parse.getElementsByClass("pinned");
-        logger.info(user);
+        //logger.info(user);
 
         //先用总的判断有哪些进行了更新 转发推特修改
         int realSize = pinned.size();
