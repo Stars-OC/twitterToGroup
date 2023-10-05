@@ -101,21 +101,25 @@ public class HtmlParse {
 
         //先用总的判断有哪些进行了更新 转发推特修改
         int realSize = pinned.size();
-        //这个是除去转发的推文 先去除明天再说
-        while (!config.getEnableForward()){
-            if(!tweets.get(realSize).attr("href").contains(user)){
-                realSize++;
-            }else {
-                break;
+
+        //这个是除去转发的推文
+        if(!config.getEnableForward()){
+            while (true){
+                if(!tweets.get(realSize).attr("href").contains(user)){
+                    realSize++;
+                }else {
+                    break;
+                }
+            }
+
+
+            if(realSize >= tweetSize){
+                //防止这货转发太多照成的问题
+                return false;
             }
         }
 
         //TODO 适配转发的推文 -> 只需要一个User对象即可
-        if(realSize >= tweetSize){
-            //防止这货转发太多照成的问题
-            return false;
-        }
-
         String[] content = tweets.get(realSize).attr("href").split("/");
         if(!lastId.containsKey(user)){
             lastId.put(user,getTweetId(content));
