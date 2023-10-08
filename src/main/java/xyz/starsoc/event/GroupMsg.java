@@ -61,9 +61,11 @@ public class GroupMsg extends SimpleListenerHost {
                     groupObject.sendMessage("======help=======" +
                             "\n!(！)twitter list 可以查看当前群聊订阅" +
                             "\n!(！)twitter add Twitter用户(不要带@) " +
-                            "\n!(！)twitter addall Twitter用户(不要带@)" +
+                            "\n!(！)twitter addAll Twitter用户(不要带@)" +
                             "\n添加该Twitter用户至所有群聊" +
                             "\n!(！)twitter delete Twitter用户(不要带@)" +
+                            "\n!(！)twitter deleteAll Twitter用户(不要带@)"+
+                            "\n删除该Twitter用户至所有群聊" +
                             "\n!(！)twitter addPer 可以@群成员来添加使用权限" +
                             "\n以上弄多个用户 但是要有 \" \" (空格进行分别) ");
                     return;
@@ -152,13 +154,31 @@ public class GroupMsg extends SimpleListenerHost {
                         count += addTwitterUser(group,user)?1 : 0;
                     }
 
-                    addAllUsers += count == groupSize?user:"";
+                    addAllUsers += count > 0?user:"";
                     if(i == commandLength -1){
                         break;
                     }
                     addAllUsers += " ";
                 }
                 groupObject.sendMessage("添加推特用户[" + addAllUsers + "]成功");
+
+                return;
+            case "deleteall":
+                String deleteAllUsers = "";
+                for(int i = 2; i < commandLength; i++){
+                    String user = commands[i];
+                    int count = 0;
+                    for(long group : groupKey){
+                        count += deleteTwitterUser(group,user)?1 : 0;
+                    }
+
+                    deleteAllUsers += count > 0?user:"";
+                    if(i == commandLength -1){
+                        break;
+                    }
+                    deleteAllUsers += " ";
+                }
+                groupObject.sendMessage("删除推特用户[" + deleteAllUsers + "]成功");
 
                 return;
             default:
