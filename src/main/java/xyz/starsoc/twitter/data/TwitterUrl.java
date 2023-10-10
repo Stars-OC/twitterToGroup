@@ -38,6 +38,7 @@ public class TwitterUrl {
             try {
                 execute = client.newCall(request).execute();
             } catch (IOException e) {
+                execute.close();
                 continue;
             }
             if (!execute.isSuccessful()){

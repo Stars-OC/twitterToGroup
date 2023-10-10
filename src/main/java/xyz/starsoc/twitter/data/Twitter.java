@@ -161,6 +161,7 @@ public class Twitter {
 
         Response execute = call.execute();
         if(!execute.isSuccessful()){
+            execute.close();
             return false;
         }
 
@@ -171,6 +172,7 @@ public class Twitter {
 
             String tweets = getRefresh(newUrl);
             if(tweets == null){
+                body.close();
                 return false;
             }
 
