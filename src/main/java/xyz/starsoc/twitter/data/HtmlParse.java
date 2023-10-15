@@ -91,7 +91,7 @@ public class HtmlParse {
         Elements tweets = parse.getElementsByClass("tweet-link");
         int tweetSize = tweets.size();
         if(tweetSize == 0){
-            //logger.warn("尚未解析到该页面的推文");
+            logger.warn("尚未解析到该页面的推文");
             return false;
         }
         //初始User
@@ -106,16 +106,14 @@ public class HtmlParse {
         if(!config.getEnableForward()){
             while (true){
                 if(!tweets.get(realSize).attr("href").contains(user)){
-                    realSize++;
+                    if(++realSize >= tweetSize){
+                        //防止这货转发太多照成的问题
+                        return false;
+                    }
+
                 }else {
                     break;
                 }
-            }
-
-
-            if(realSize >= tweetSize){
-                //防止这货转发太多照成的问题
-                return false;
             }
         }
 
@@ -124,6 +122,10 @@ public class HtmlParse {
         if(!lastId.containsKey(user)){
             lastId.put(user,getTweetId(content));
             return false;
+        }
+
+        if (config.getDebug()){
+            logger.info("开始存储 " + user + "的转发推文");
         }
 
         long oldId = lastId.get(user);

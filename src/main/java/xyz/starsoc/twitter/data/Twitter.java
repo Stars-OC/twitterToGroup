@@ -135,6 +135,10 @@ public class Twitter {
 //        }
         }
         //users.forEach(System.out::println);
+        if (config.getDebug()){
+            logger.info("开始进行合并和获取");
+        }
+
         for (String username : users){
             try {
                 count++;
@@ -167,6 +171,11 @@ public class Twitter {
 
         ResponseBody body = execute.body();
         String html = body.string();
+
+        if (config.getDebug()){
+            logger.info("开始进行用户" + username + "页面的获取");
+        }
+
         if (execute.code() == 201){
             String newUrl = parse.getNewUrl(html);
 
@@ -216,6 +225,11 @@ public class Twitter {
         String format = String.format(TwitterUrl.tweetUrl, username, tweetId);
 //        logger.info(format);
         Call call = getCall(format);
+
+        if (config.getDebug()){
+            logger.info("正在获取 用户: " + username + " 的推文{" + tweetId + "}");
+        }
+
         //TODO 将回复消息另写一个存储池
         try {
 
@@ -300,6 +314,10 @@ public class Twitter {
         int count = 0;
         int successful = 0;
 
+        if (config.getDebug()){
+            logger.info("正在进行推文的获取合并");
+        }
+
         for (UserToGroup userToGroup : ALL){
 
             String username = userToGroup.getUsername();
@@ -314,6 +332,10 @@ public class Twitter {
 //                logger.info("test");
             }
 
+        }
+
+        if (config.getDebug() && ALL.size() == 0){
+            logger.info("推文获取成功 没有推文可以推送");
         }
 
         if(successful == 0){

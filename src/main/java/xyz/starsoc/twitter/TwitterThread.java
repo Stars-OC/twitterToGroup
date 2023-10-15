@@ -34,6 +34,10 @@ public class TwitterThread {
                 }
             }
 
+            if (config.getDebug()){
+                logger.info("正常执行Thread");
+            }
+
             //开始进行执行 TODO 将源站的做出来
             if(!twitter.getGroupUser()){
                 logger.warn("未能获取到相关群聊信息");
