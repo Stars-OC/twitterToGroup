@@ -16,7 +16,7 @@ public final class TwitterToGroup extends JavaPlugin{
     public static final TwitterToGroup INSTANCE = new TwitterToGroup();
 
     private TwitterToGroup(){
-        super(new JvmPluginDescriptionBuilder("xyz.starsoc.twittertogroup","0.1.0")
+        super(new JvmPluginDescriptionBuilder("xyz.starsoc.twittertogroup","0.1.1")
                 .name("TwitterToGroup")
                 .author("Clusters_stars")
                 .build());

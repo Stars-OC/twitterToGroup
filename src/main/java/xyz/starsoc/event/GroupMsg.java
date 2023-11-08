@@ -89,6 +89,8 @@ public class GroupMsg extends SimpleListenerHost {
                     }
                     groupObject.sendMessage("====当前群聊订阅(" + groupId + ")==== \n" + userList);
                     return;
+                default:
+                    break;
             }
 
         }
@@ -192,7 +194,7 @@ public class GroupMsg extends SimpleListenerHost {
         if(!groups.containsKey(groupId)){
             groups.put(groupId,new HashSet<>());
         }
-        Twitter.isAdd = true;
+        Twitter.isChanged = true;
         return groups.get(groupId).add(user);
     }
 
@@ -201,7 +203,7 @@ public class GroupMsg extends SimpleListenerHost {
             groups.put(groupId,new HashSet<>());
             return false;
         }
-        Twitter.isAdd = true;
+        Twitter.isChanged = true;
         return groups.get(groupId).remove(user);
     }
 

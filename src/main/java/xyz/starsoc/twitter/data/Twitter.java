@@ -25,7 +25,7 @@ public class Twitter {
     public static final Twitter INSTANCE = new Twitter();
     public static final HashSet<UserToGroup> ALL = new HashSet<>();
     public static Set<String> users = new HashSet<>();
-    public static boolean isAdd = true;
+    public static boolean isChanged = true;
 
     private static final Logger logger = LoggerFactory.getLogger("Twitter");
 
@@ -116,8 +116,10 @@ public class Twitter {
         int count = 0;
         int successful = 0;
 
-        if(isAdd){
-            isAdd = false;
+        if(isChanged){
+            isChanged = false;
+            //先将原有的进行清除
+            ALL.clear();
             for(long group : groups.keySet()){
 
                 for(String username : groups.get(group)){
