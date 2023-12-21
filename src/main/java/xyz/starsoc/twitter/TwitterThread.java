@@ -24,31 +24,35 @@ public class TwitterThread {
 
         //执行线程
         Runnable runnable = () -> {
-            //若没有处理好init就关闭
-            if(!flag){
-                if (!url.initUrl()){
-                    logger.warn("Url获取失败。");
-                    return;
-                }else {
-                    flag = true;
+            try{
+                //若没有处理好init就关闭
+                if(!flag){
+                    if (!url.initUrl()){
+                        logger.warn("Url获取失败。");
+                        return;
+                    }else {
+                        flag = true;
+                    }
                 }
-            }
 
-            if (config.getDebug()){
-                logger.info("正常执行Thread");
-            }
+                if (config.getDebug()){
+                    logger.info("正常执行Thread");
+                }
 
-            //开始进行执行 TODO 将源站的做出来
-            if(!twitter.getGroupUser()){
-                logger.warn("未能获取到相关群聊信息");
-                return;
-            }
+                //开始进行执行 TODO 将源站的做出来
+                if(!twitter.getGroupUser()){
+                    logger.warn("未能获取到相关群聊信息");
+                    return;
+                }
 
-            if(!twitter.getTweets()){
-                return;
-            }
+                if(!twitter.getTweets()){
+                    return;
+                }
 
-            logger.info("获取推文成功，发送到各群完毕");
+                logger.info("获取推文成功，发送到各群完毕");
+            }catch (Exception e){
+                logger.error("TwitterThread执行失败 error: {}",e.getMessage(), e);
+            }
 
         };
         ScheduledExecutorService service = Executors.newSingleThreadScheduledExecutor();
