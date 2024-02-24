@@ -29,16 +29,16 @@ public class TwitterUrl {
         for (String url : urls){
             //判断是否链接
             Request request = new Request.Builder()
-                    .url(String.format(url,"X"))
-                    .addHeader("Accept-Language","zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,en-GB;q=0.6")
-                    .addHeader("Host","nitter.unixfox.eu")
+                    .url(url + "X")
+                    .addHeader("Host",url.split("/")[2])
                     .addHeader("Accept","*/*")
                     .build();
             Response execute = null;
             try {
                 execute = client.newCall(request).execute();
             } catch (IOException e) {
-                execute.close();
+
+
                 continue;
             }
             if (!execute.isSuccessful()){

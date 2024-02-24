@@ -51,7 +51,8 @@ public class TwitterThread {
 
                 logger.info("获取推文成功，发送到各群完毕");
             }catch (Exception e){
-                logger.error("TwitterThread执行失败 error: {}",e.getMessage(), e);
+                e.printStackTrace();
+                logger.error("TwitterThread执行失败 error: {}",e, e);
             }
 
         };
