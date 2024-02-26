@@ -25,5 +25,5 @@ object Config : AutoSavePluginConfig("config") {
     val enableForward by value(false)
 
     val enableMirror by value(true)
-    val mirrorList by value(mutableSetOf("https://nitter.privacydev.net/"))
+    val mirrorList by value(mutableSetOf("https://nitter.esmailelbob.xyz/"))
 }

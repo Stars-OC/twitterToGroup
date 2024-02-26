@@ -48,6 +48,7 @@ public class Twitter {
                 .url(url)
                 .addHeader("Host",url.split("/")[2])
                 .addHeader("Accept", "*/*")
+                .addHeader("accept-language","zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7,en-GB;q=0.6")
                 .build();
         return client.newCall(request);
     }
